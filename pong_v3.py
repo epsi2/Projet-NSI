@@ -60,13 +60,13 @@ def commencement_jeu():
             if fond.coords(joueurs[0])[1]<=fond.coords(balle)[1]<=fond.coords(joueurs[0])[3] and fond.coords(balle)[0]<=fond.coords(joueurs[0])[2]: #lorsque la balle touche le joueur 1
                 if fond.coords(balle)[1]<=(fond.coords(joueurs[0])[3] - fond.coords(joueurs[0])[1])/2 + fond.coords(joueurs[0])[1]:                 #lorsque la balle touche la partie haute du joueur 1
                     balle_x=fond.coords(joueurs[0])[2]
-                    k+=0.3                                                                  #variable permettant d'augmenter ou diminuer la vitesse de la balle à chaque rebond sur le joueur 1                                
+                    k+=0.1                                                                  #variable permettant d'augmenter ou diminuer la vitesse de la balle à chaque rebond sur le joueur 1                                
                     direction_balle_x = (-direction_balle_x+k)                              #renvoie la balle dans le sens opposé de l'arrivée
                     direction_balle_y = -abs((direction_balle_y+k)*angle)                   #renvoie la balle systématiquement vers le haut avec un angle aléatoire (l'angle est modifié en modifiant la composante y du vecteur vitesse de la balle)
                 
                 elif (fond.coords(joueurs[0])[3] - fond.coords(joueurs[0])[1])/2 + fond.coords(joueurs[0])[1] < fond.coords(balle)[1]: #lorsque la balle touche la partie basse du joueur 1
                     balle_x=fond.coords(joueurs[0])[2]
-                    k+=0.3
+                    k+=0.1
                     direction_balle_x = (-direction_balle_x+k)
                     direction_balle_y = abs((direction_balle_y+k)*angle)                                                               #renvoie la balle systématiquement vers le bas avec un angle aléatoire
 
@@ -74,13 +74,13 @@ def commencement_jeu():
             elif fond.coords(joueurs[1])[1]<=fond.coords(balle)[1]<=fond.coords(joueurs[1])[3] and fond.coords(joueurs[1])[0]<=fond.coords(balle)[0]: #lorsque la balle touche le joueur 2
                 if fond.coords(balle)[1] <= (fond.coords(joueurs[1])[3] - fond.coords(joueurs[1])[1])/2 + fond.coords(joueurs[1])[1]:                 #lorsque la balle touche la partie haute du joueur 2
                     balle_x=fond.coords(joueurs[1])[0]
-                    k+=0.5  
+                    k+=0.2  
                     direction_balle_x = (-direction_balle_x-k) 
                     direction_balle_y = -abs((direction_balle_y+k)*angle)
                 
                 elif fond.coords(balle)[1] > (fond.coords(joueurs[1])[3] - fond.coords(joueurs[1])[1])/2 + fond.coords(joueurs[1])[1]:                #lorsque la balle touche la partie basse du joueur 2
                     balle_x=fond.coords(joueurs[1])[0]
-                    k+=0.5     
+                    k+=0.2     
                     direction_balle_x = (-direction_balle_x-k)
                     direction_balle_y = abs((direction_balle_y+k)*angle)
 
@@ -105,7 +105,7 @@ def commencement_jeu():
 
             elif fond.coords(balle)[1]<0-direction_balle_y:                     #si la balle cogne le haut
                 direction_balle_y = -direction_balle_y*random.uniform(0.3,1.1)  #renvoie la balle avec un angle aléatoire (angle tout de même limité)
-    
+            print(k)
     
         
 
