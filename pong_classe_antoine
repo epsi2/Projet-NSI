@@ -1,0 +1,271 @@
+from tkinter import *
+from time import *
+from socket import socket, AF_INET, SOCK_STREAM
+import threading
+import random
+import re
+
+global k
+class Pong():
+
+    def __init__(self):
+        
+        self.fenetre_pong = Toplevel()
+        self.bouton_meme_ordinateur = Button(self.fenetre_pong,width=50, height= 50, command = lambda:[destruction(),self.meme_ordinateur, self.commencement_jeu], bg='blue',text= 'même ordinateur')
+        self.bouton_deux_ordinateur = Button(self.fenetre_pong,width=50, height= 50, command = lambda:[deux_ordinateur(), self.selection_joueurs], bg='red',text = 'local')
+        self.bouton_meme_ordinateur.grid(column = 0, row = 0)
+        self.bouton_deux_ordinateur.grid(column = 1, row = 0)
+        
+        if self.fenetre_pong.winfo_screenheight()>800:
+            self.largeur_fenetre = 1500
+            self.hauteur_fenetre = 800
+        else:
+            self.largeur_fenetre = 1200
+            self.hauteur_fenetre = 650
+
+        self.fond = Canvas(self.fenetre_pong, width=self.largeur_fenetre, height= self.hauteur_fenetre, background = "black")
+
+
+        self.fenetre_pong.mainloop()
+
+
+
+
+
+    def commencement_jeu():
+        global self.joueurs,self.balle,k,affichage_self.score,self.joueur_1_rectangle,self.joueur_2_rectangle,self.balle_x,self.balle_y,bouton_meme_ordinateur,self.deplacement_joueurs,self.direction_balle_x,self.direction_balle_y,fond,self.largeur_fenetre,self.largeur_fenetre,self.liste_deplacement,self.liste_touches,self.score,thread
+        
+        self.joueur_1_rectangle = self.fond.create_rectangle(50,(self.largeur_fenetre/2-100),70,(self.largeur_fenetre/2+100), fill ="blue")
+        self.joueur_2_rectangle = self.fond.create_rectangle(self.largeur_fenetre-100,self.largeur_fenetre/2-100,self.largeur_fenetre-80,self.largeur_fenetre/2+100, fill ="white")
+
+        self.joueurs=[self.joueur_1_rectangle,self.joueur_2_rectangle]
+        
+        
+        self.balle_x = 750
+        self.balle_y = 400
+        self.balle = self.fond.create_oval(self.balle_x,self.balle_y,self.balle_x+20,self.balle_y+20, fill='white')
+        self.direction_balle_y = 4
+        self.direction_balle_x = 4
+        self.k=0
+        self.fond.grid(column =0, row = 0)
+        
+
+        self.deplacement_joueurs = {'z':['-10','0'],'s':['10','0'],'o':['-10','1'],'l':['10','1']}  #dictionnaire des touches, de son déplacement et du joueur qu'elle déplace
+        self.liste_touches = []  #les touches actuellement pressées
+        self.liste_deplacement = ['z','s','o','l'] #les touches pouvant bouger les self.joueurs
+        self.score = [0,0]
+        self.affichage_score = self.fond.create_text(self.largeur_fenetre/2,50, text=(str(self.score[0]),":",str(self.score[1])), fill="white", font=("Raleway",30,"bold"))#affichage du self.score
+
+    def key_down(e): #fonction qui regarde si la touche est déjà presséee, sinon l'ajoute dans self.liste_touches 
+        if e.keysym not in self.liste_touches :
+            if e.keysym in self.liste_deplacement:
+                self.liste_touches.append(e.keysym)
+                print(self.liste_touches)
+
+    def key_up(e): #fonction qui regarde lorsqu'une touche est relachée si elle est dans liste_touche et si oui l'enlève de liste_touche
+        if e.keysym in self.liste_touches:
+            self.liste_touches.remove(e.keysym)
+
+
+    def rebondissement_balle():        #gère les rebonds de la self.balle
+        global self.balle_x,self.balle_y,self.direction_balle_x,self.direction_balle_y,self.score,k
+        angle=random.uniform(0.5, 1.5)
+        
+        if mode==0 or typej == 1:
+            if fond.coords(self.joueurs[0])[1]<=fond.coords(self.balle)[1]<=fond.coords(self.joueurs[0])[3] and fond.coords(self.balle)[0]<=fond.coords(self.joueurs[0])[2]: #lorsque la self.balle touche le joueur 1
+                if fond.coords(self.balle)[1]<=(fond.coords(self.joueurs[0])[3] - fond.coords(self.joueurs[0])[1])/2 + fond.coords(self.joueurs[0])[1]:                 #lorsque la self.balle touche la partie haute du joueur 1
+                    self.balle_x=fond.coords(self.joueurs[0])[2]
+                    k+=0.3                                                                  #variable permettant d'augmenter ou diminuer la vitesse de la self.balle à chaque rebond sur le joueur 1                                
+                    self.direction_balle_x = (-self.direction_balle_x+k)                              #renvoie la self.balle dans le sens opposé de l'arrivée
+                    self.direction_balle_y = -abs((self.direction_balle_y+k)*angle)                   #renvoie la self.balle systématiquement vers le haut avec un angle aléatoire (l'angle est modifié en modifiant la composante y du vecteur vitesse de la self.balle)
+                
+                elif (fond.coords(self.joueurs[0])[3] - fond.coords(self.joueurs[0])[1])/2 + fond.coords(self.joueurs[0])[1] < fond.coords(self.balle)[1]: #lorsque la self.balle touche la partie basse du joueur 1
+                    self.balle_x=fond.coords(self.joueurs[0])[2]
+                    k+=0.3
+                    self.direction_balle_x = (-self.direction_balle_x+k)
+                    self.direction_balle_y = abs((self.direction_balle_y+k)*angle)                                                               #renvoie la self.balle systématiquement vers le bas avec un angle aléatoire
+
+            
+            elif fond.coords(self.joueurs[1])[1]<=fond.coords(self.balle)[1]<=fond.coords(self.joueurs[1])[3] and fond.coords(self.joueurs[1])[0]<=fond.coords(self.balle)[0]: #lorsque la self.balle touche le joueur 2
+                if fond.coords(self.balle)[1] <= (fond.coords(self.joueurs[1])[3] - fond.coords(self.joueurs[1])[1])/2 + fond.coords(self.joueurs[1])[1]:                 #lorsque la self.balle touche la partie haute du joueur 2
+                    self.balle_x=fond.coords(self.joueurs[1])[0]
+                    k+=0.5  
+                    self.direction_balle_x = (-self.direction_balle_x-k) 
+                    self.direction_balle_y = -abs((self.direction_balle_y+k)*angle)
+                
+                elif fond.coords(self.balle)[1] > (fond.coords(self.joueurs[1])[3] - fond.coords(self.joueurs[1])[1])/2 + fond.coords(self.joueurs[1])[1]:                #lorsque la self.balle touche la partie basse du joueur 2
+                    self.balle_x=fond.coords(self.joueurs[1])[0]
+                    k+=0.5     
+                    self.direction_balle_x = (-self.direction_balle_x-k)
+                    self.direction_balle_y = abs((self.direction_balle_y+k)*angle)
+
+            elif fond.coords(self.balle)[0] > (self.largeur_fenetre - 20): #si la self.balle dépasse le joueur 2 
+                self.score[0] += 1
+                self.balle_x = 750               #réinitialise les coordonnées de la self.balle
+                self.balle_y = 400           
+                self.direction_balle_x = -7      #réinitialise la composante x du vecteur vitesse de la self.balle
+                self.direction_balle_y = 7       #                           y 
+                k=0
+
+            elif fond.coords(self.balle)[0]<20:  #si la self.balle dépasse le joueur 1
+                self.balle_x = 750
+                self.balle_y = 400
+                self.direction_balle_x = 7
+                self.direction_balle_y = 7
+                self.score[1] += 1
+                k=0
+
+            elif fond.coords(self.balle)[1]>self.largeur_fenetre-self.direction_balle_y:       #si la self.balle cogne le bas
+                self.direction_balle_y = -self.direction_balle_y*random.uniform(0.3,1.1)  #renvoie la self.balle avec un angle aléatoire (angle tout de même limité)
+
+            elif fond.coords(self.balle)[1]<0-self.direction_balle_y:                     #si la self.balle cogne le haut
+                self.direction_balle_y = -self.direction_balle_y*random.uniform(0.3,1.1)  #renvoie la self.balle avec un angle aléatoire (angle tout de même limité)
+    
+    
+        
+
+    def mouvement_joueurs_et_balle(*args): 
+        global self.balle_x,self.balle_y,affichage_self.score
+        for touche in self.liste_touches:                                                                             #pour toutes le touches pressées actuellement, déplace les self.joueurs en fonction de la touche pressées
+            if int(self.deplacement_joueurs[touche][0])<0 :                                                           #si on déplace la barre vers le haut
+                if fond.coords(self.joueurs[int(self.deplacement_joueurs[touche][1])])[1]> 5:   
+                    if mode == 1 and typej == 1 and int(self.deplacement_joueurs[touche][1]) == 0:                    #si la barre ne va pas en dehors de la fenetre et qu'on joue en local et que le joueur est le numéro 1
+                        fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0]) #déplace le joueur
+                    elif mode == 1 and typej == 2 and int(self.deplacement_joueurs[touche][1]) == 1:
+                        fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0])
+                    elif mode == 0:                                                                              #si on joue sur le même appareil
+                        fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0])
+            
+            elif fond.coords(self.joueurs[int(self.deplacement_joueurs[touche][1])])[3]<self.largeur_fenetre:                   #même chose mais cette fois-ci, si on déplace la barre vers le bas
+                if mode == 1 and typej == 1 and int(self.deplacement_joueurs[touche][1]) == 0 :
+                    fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0])
+
+                elif mode == 1 and typej == 2 and int(self.deplacement_joueurs[touche][1]) == 1 :
+                    fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0])
+                
+                elif mode == 0 :
+                    fond.move(self.joueurs[int(self.deplacement_joueurs[touche][1])],0,self.deplacement_joueurs[touche][0])  
+        
+        
+        self.balle_y += self.direction_balle_y                                    #modifie la variable donnant les coordonnées de la self.balle
+        self.balle_x += self.direction_balle_x
+        fond.coords(self.balle,self.balle_x,self.balle_y,self.balle_x+20,self.balle_y+20)        #réactualise la position de la self.balle
+        rebondissement_balle()
+        
+        if mode == 0 or typej == 1:
+            fond.delete(affichage_self.score)                                    #supprime le self.score pour le remettre et éviter la superposition de deux self.score où l'absence d'actualisation
+            affichage_self.score = fond.create_text(750,50, text=(str(self.score[0]),":",str(self.score[1])), fill="white", font=("Raleway",30,"bold"))
+        self.fenetre_pong.after(10,mouvement_joueurs_et_balle)
+        
+
+    def multi():
+        global ss, sc, self.balle_x, self.balle_y, self.direction_balle_x, self.direction_balle_y, fond, affichage_self.score, typej
+        bouton_joueur_1.destroy()
+        bouton_joueur_2.destroy()
+        print("\n***********************************\n") 
+        fin=True
+        self.balle_x = 750           #initialise les coordonnées de la self.balle
+        self.balle_y = 400
+        self.direction_balle_y = 0   #initialise les coordonnées du vecteur vitesse de la self.balle
+        self.direction_balle_x = 0
+        mouvement_joueurs_et_balle()
+        
+
+        if typej == 1:                        #si le joueur est de numéro 1
+            ss = socket(AF_INET,SOCK_STREAM)
+            ss.bind(("localhost",50004))
+            ss.listen(1)
+            connexion=True
+            
+
+            while connexion:
+                print("\n***********************************\n")
+                print("\nEn attente d'un joueur...\n")
+                client, adresse= ss.accept()       #établit la connexion avec l'appareil du joueur de numéro 2
+                print("\n***********************************\n")
+                print("Client {} connecté".format(adresse))
+                print("\n***********************************\n")
+        
+                self.direction_balle_y = 7   #la self.balle bouge, la partie commence
+                self.direction_balle_x = 7
+
+                while fin:
+                    client.send((str(fond.coords(self.joueurs[0]))+","+str(fond.coords(self.balle))+","+str(self.score)).encode("utf8"))    #envoie les coordonnées de la barre du joueur 1, de la self.balle et le self.score
+                    reponsebrut = client.recv(1024).decode("utf8")                                                           #réception du message du joueur 2 en le décodant contenant les coordonnées de la barre ce dernier                                     
+                    reponse = re.sub("\[|\]","",reponsebrut).split(", ")                                                     #nettoie le message
+                
+                    if len(reponse)==4:                                                                                      #si le message est de longueur 4 (il se peut que deux messages soient reçus en même temps, générant ainsi des problèmes)
+                        fond.coords(self.joueurs[1], float(reponse[0]),float(reponse[1]),float(reponse[2]),float(reponse[3]))     #actualise les coordonnées de la barre du joueur 1   
+
+                    self.fenetre_pong.update()
+            
+                
+
+        if typej == 2:
+            sc = socket(AF_INET,SOCK_STREAM)     
+            sc.connect(("localhost",50004))
+        
+            self.direction_balle_y = 7                                           #la self.balle bouge, la partie commence
+            self.direction_balle_x = 7                                           
+
+            while fin:
+                    sc.send(str(fond.coords(self.joueurs[1])).encode("utf8"))       #envoie les coordonnées de la barre du joueur 2      
+                    reponsebrut=sc.recv(1024).decode("utf8").split(",")        #réception du message du joueur 1 en le décodant contenant les coordonnées de la barre ce dernier, celles de la self.balle et le self.score
+                    
+                    coords=[]
+                    for coordsbrut in reponsebrut :                            #nettoie le message
+                        coords.append(re.sub("\[|\]","",coordsbrut).split(","))
+
+
+                    if len(coords)==10:                                        #si le message est de longueur 10 (il se peut que deux messages soient reçus en même temps, générant ainsi des problèmes)
+                        fond.coords(self.joueurs[0], float(coords[0][0]), float(coords[1][0]), float(coords[2][0]), float(coords[3][0]))        #actualise les coordonnées de la barre du joueur 2
+                        fond.coords(self.balle, float(coords[4][0]), float(coords[5][0]), float(coords[6][0]), float(coords[7][0]))             #actualise les coordonnées de la self.balle
+
+                        if int(coords[8][0]) != self.score[0]  or int(coords[9][0]) != self.score[1]:                                                #si le self.score reçu est différent du self.score actuel, la suite du code va alors actualiser ce dernier
+                            self.score[0], self.score[1] = int(coords[8][0]), int(coords[9][0])
+                            fond.delete(affichage_self.score)
+                            affichage_self.score = fond.create_text(750,50, text=(str(self.score[0]),":",str(self.score[1])), fill="white", font=("Raleway",30,"bold"))     #actualise le self.score
+
+                    self.fenetre_pong.update()
+        
+
+    
+    
+    if mode == 1:
+        thread = threading.Thread(target=multi)         
+        thread.start()                              #démarre le thread afin que le processus de connexion tourne en parallèle et ne bloque pas le code
+    else :
+        mouvement_joueurs_et_balle()                #si les self.joueurs jouent sur le même appareil, la partie commence
+
+
+
+    self.fenetre_pong.bind("<KeyPress>", key_down)  
+    self.fenetre_pong.bind("<KeyRelease>",key_up) 
+
+def selection_joueurs():
+    global bouton_joueur_1,bouton_joueur_2
+    bouton_meme_ordinateur.destroy()
+    bouton_deux_ordinateur.destroy()
+    bouton_joueur_1 = Button(self.fenetre_pong,width=50, height= 50, command = lambda:[joueur_un(),commencement_jeu()], bg='blue',text= 'joueur 1')
+    bouton_joueur_2 = Button(self.fenetre_pong,width=50, height= 50, command = lambda:[joueur_deux(),commencement_jeu()], bg='red',text = 'joueur 2')
+    bouton_joueur_1.grid(column = 0, row = 0)
+    bouton_joueur_2.grid(column = 1, row = 0)
+
+def meme_ordinateur():
+    global mode
+    mode = 0
+    
+
+def deux_ordinateur():
+    global mode
+    mode = 1
+def joueur_un():
+    global typej
+    typej = 1
+def joueur_deux():
+    global typej
+    typej = 2
+def destruction():
+    bouton_meme_ordinateur.destroy()
+    bouton_deux_ordinateur.destroy()
+
