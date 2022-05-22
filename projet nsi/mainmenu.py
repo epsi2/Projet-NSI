@@ -9,17 +9,28 @@ from tkinter import*
 from enregistrement import Enregistrement
 
 #importation de la classe pour jouer au morpion
-from morpion import Tictac
+from morpionV2_5 import Morpion
+
+#from pong import Pong
+from pong_version_finale import Pong_class
 
 #fonction pour le jeu du morpion
-def tictac():
+def Morpion_func():
 
     #création d'un objet de la classe Tictac
-    objetmorpion = Tictac()
+    objetmorpion = Morpion()
 
-#fonction pour le jeu de dame À COMPLÉTER
-def dame():
-    pass 
+def pong_game():
+    
+    pong_fenetre = Tk()
+    pong_fenetre.geometry("500x500")
+    pong_fenetre.resizable(0,0)
+    pong_game = Pong_class(pong_fenetre)
+    pong_fenetre.mainloop()
+
+
+
+
 
 #création d'un objet de la classe Enregistrement
 objetenregistrement = Enregistrement()
@@ -38,25 +49,32 @@ maincanvas.place(x=0, y=0)
 damecanvas = Canvas(maincanvas)
 damecanvas.place(x= 30, y=40)
 
-#création du bouton pour lancer le jeu de dame
-damebutton = Button(damecanvas, bg="#049300", text="jouer au jeu de dame", command=dame)
-damebutton.place(x=100, y=0)
 
-#création de l'image du jeu de dame dans le canvas
-dameimage = PhotoImage(file="images/jeu-de-dame.gif")
-damecanvas.create_image(0, 0, image = dameimage, anchor = NW)
-
-#création du canvas pour le jeu de dame
+#création du canvas pour le morpion
 ticcanvas = Canvas(maincanvas)
 ticcanvas.place(x= 600, y=40)
  
 #création du bouton pour lancer le morpion
-ticbutton = Button(ticcanvas, bg="#049300", text="jouer au morpion", command=tictac)
+ticbutton = Button(ticcanvas, bg="#049300", text="jouer au morpion", command=Morpion_func)
 ticbutton.place(x=0, y=0)
 
 #création de l'image du morpion dans le canvas
 ticimage = PhotoImage(file="images/tictacimage.gif")
 ticcanvas.create_image(0, 0, image = ticimage, anchor = NW)
+
+#création du canvas pour le pong
+pongcanvas = Canvas(maincanvas)
+pongcanvas.place(x= 600, y=80)
+ 
+#création du bouton pour lancer le pong
+pongbutton = Button(pongcanvas, bg="#049300", text="jouer au pong", command=pong_game)
+pongbutton.place(x=600, y=80)
+
+#création de l'image du pong dans le canvas
+pongimage = PhotoImage(file="images/hqdefault.gif")
+pongcanvas.create_image(0, 0, image = pongimage, anchor = NW)
+
+
 
 
 mainwindow.mainloop()
